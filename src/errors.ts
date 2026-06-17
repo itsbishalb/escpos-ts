@@ -1,7 +1,7 @@
 // src/errors.ts
 
 export class EscposError extends Error {
-  readonly resultCode: number;
+  resultCode: number;
 
   constructor(msg: string, code = 1) {
     super(msg);
@@ -81,9 +81,11 @@ export class DeviceNotFoundError extends EscposError {
   }
 }
 
-export class USBNotFoundError extends EscposError {
+export class USBNotFoundError extends DeviceNotFoundError {
   constructor(msg = '') {
-    super(`USB device not found (${msg})`, 91);
+    super(msg);
+    this.resultCode = 91;
+    this.message = `USB device not found (${msg})`;
     this.name = 'USBNotFoundError';
   }
 }
