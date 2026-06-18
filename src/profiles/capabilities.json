@@ -1,0 +1,361 @@
+{
+  "profiles": {
+    "default": {
+      "name": "Default",
+      "notes": "Default printer profile with most common capabilities",
+      "codePages": {
+        "0": "PC437",
+        "1": "PC850",
+        "2": "PC860",
+        "3": "PC863",
+        "4": "PC865",
+        "5": "WPC1252",
+        "6": "PC866",
+        "7": "PC852",
+        "8": "PC858",
+        "9": "PC720",
+        "10": "PC775",
+        "11": "PC855",
+        "12": "PC861",
+        "13": "PC862",
+        "14": "PC864",
+        "15": "PC869",
+        "16": "ISO8859_2",
+        "17": "ISO8859_15",
+        "18": "PC1098",
+        "19": "PC1118",
+        "20": "PC1119",
+        "21": "PC1125",
+        "22": "WPC1250",
+        "23": "WPC1251",
+        "24": "WPC1253",
+        "25": "WPC1254",
+        "26": "WPC1255",
+        "27": "WPC1256",
+        "28": "WPC1257",
+        "29": "WPC1258",
+        "30": "KZ1048",
+        "255": "UserDefined"
+      },
+      "features": {
+        "paperFullCut": true,
+        "paperPartialCut": false,
+        "cashDrawer": true,
+        "barcodeB": true,
+        "qrCode": true,
+        "graphics": true,
+        "bitImageColumn": true,
+        "bitImageRaster": true
+      },
+      "fonts": {
+        "0": { "columns": 42, "charV": 24, "charH": 12 },
+        "1": { "columns": 56, "charV": 17, "charH": 9 }
+      },
+      "media": {
+        "width": { "mm": 80, "pixels": 512 },
+        "dpi": 180
+      }
+    },
+    "TM-T88II": {
+      "name": "TM-T88II",
+      "notes": "Epson TM-T88II",
+      "codePages": {
+        "0": "PC437",
+        "1": "PC850",
+        "2": "PC860",
+        "3": "PC863",
+        "4": "PC865"
+      },
+      "features": {
+        "paperFullCut": true,
+        "paperPartialCut": true,
+        "cashDrawer": true,
+        "barcodeB": false,
+        "qrCode": false,
+        "graphics": true,
+        "bitImageColumn": true,
+        "bitImageRaster": false
+      },
+      "fonts": {
+        "0": { "columns": 42, "charV": 24, "charH": 12 },
+        "1": { "columns": 56, "charV": 17, "charH": 9 }
+      },
+      "media": {
+        "width": { "mm": 80, "pixels": 512 },
+        "dpi": 180
+      }
+    },
+    "TM-T88III": {
+      "name": "TM-T88III",
+      "notes": "Epson TM-T88III",
+      "codePages": {
+        "0": "PC437",
+        "1": "PC850",
+        "2": "PC860",
+        "3": "PC863",
+        "4": "PC865",
+        "5": "WPC1252",
+        "6": "PC866",
+        "7": "PC852",
+        "8": "PC858"
+      },
+      "features": {
+        "paperFullCut": true,
+        "paperPartialCut": true,
+        "cashDrawer": true,
+        "barcodeB": false,
+        "qrCode": false,
+        "graphics": true,
+        "bitImageColumn": true,
+        "bitImageRaster": false
+      },
+      "fonts": {
+        "0": { "columns": 42, "charV": 24, "charH": 12 },
+        "1": { "columns": 56, "charV": 17, "charH": 9 }
+      },
+      "media": {
+        "width": { "mm": 80, "pixels": 512 },
+        "dpi": 180
+      }
+    },
+    "TM-T88IV": {
+      "name": "TM-T88IV",
+      "notes": "Epson TM-T88IV",
+      "codePages": {
+        "0": "PC437",
+        "1": "PC850",
+        "2": "PC860",
+        "3": "PC863",
+        "4": "PC865",
+        "5": "WPC1252",
+        "6": "PC866",
+        "7": "PC852",
+        "8": "PC858",
+        "16": "ISO8859_2",
+        "17": "ISO8859_15"
+      },
+      "features": {
+        "paperFullCut": true,
+        "paperPartialCut": true,
+        "cashDrawer": true,
+        "barcodeB": true,
+        "qrCode": false,
+        "graphics": true,
+        "bitImageColumn": true,
+        "bitImageRaster": true
+      },
+      "fonts": {
+        "0": { "columns": 42, "charV": 24, "charH": 12 },
+        "1": { "columns": 56, "charV": 17, "charH": 9 }
+      },
+      "media": {
+        "width": { "mm": 80, "pixels": 512 },
+        "dpi": 180
+      }
+    },
+    "TM-T88V": {
+      "name": "TM-T88V",
+      "notes": "Epson TM-T88V",
+      "codePages": {
+        "0": "PC437",
+        "1": "PC850",
+        "2": "PC860",
+        "3": "PC863",
+        "4": "PC865",
+        "5": "WPC1252",
+        "6": "PC866",
+        "7": "PC852",
+        "8": "PC858",
+        "16": "ISO8859_2",
+        "17": "ISO8859_15",
+        "18": "PC1098",
+        "19": "PC1118",
+        "20": "PC1119",
+        "21": "PC1125"
+      },
+      "features": {
+        "paperFullCut": true,
+        "paperPartialCut": true,
+        "cashDrawer": true,
+        "barcodeB": true,
+        "qrCode": true,
+        "graphics": true,
+        "bitImageColumn": true,
+        "bitImageRaster": true
+      },
+      "fonts": {
+        "0": { "columns": 42, "charV": 24, "charH": 12 },
+        "1": { "columns": 56, "charV": 17, "charH": 9 }
+      },
+      "media": {
+        "width": { "mm": 80, "pixels": 512 },
+        "dpi": 180
+      }
+    }
+  },
+  "encodings": {
+    "PC437": {
+      "name": "PC437",
+      "notes": "USA: Standard Europe",
+      "python_encode": "cp437"
+    },
+    "PC850": {
+      "name": "PC850",
+      "notes": "Multilingual",
+      "python_encode": "cp850"
+    },
+    "PC860": {
+      "name": "PC860",
+      "notes": "Portuguese",
+      "python_encode": "cp860"
+    },
+    "PC863": {
+      "name": "PC863",
+      "notes": "Canadian-French",
+      "python_encode": "cp863"
+    },
+    "PC865": {
+      "name": "PC865",
+      "notes": "Nordic",
+      "python_encode": "cp865"
+    },
+    "WPC1252": {
+      "name": "WPC1252",
+      "notes": "Latin I",
+      "python_encode": "cp1252"
+    },
+    "PC866": {
+      "name": "PC866",
+      "notes": "Cyrillic #2",
+      "python_encode": "cp866"
+    },
+    "PC852": {
+      "name": "PC852",
+      "notes": "Latin 2",
+      "python_encode": "cp852"
+    },
+    "PC858": {
+      "name": "PC858",
+      "notes": "Euro symbol",
+      "python_encode": "cp858"
+    },
+    "PC720": {
+      "name": "PC720",
+      "notes": "Arabic",
+      "python_encode": "cp720"
+    },
+    "PC775": {
+      "name": "PC775",
+      "notes": "Baltic Rim",
+      "python_encode": "cp775"
+    },
+    "PC855": {
+      "name": "PC855",
+      "notes": "Cyrillic",
+      "python_encode": "cp855"
+    },
+    "PC861": {
+      "name": "PC861",
+      "notes": "Icelandic",
+      "python_encode": "cp861"
+    },
+    "PC862": {
+      "name": "PC862",
+      "notes": "Hebrew",
+      "python_encode": "cp862"
+    },
+    "PC864": {
+      "name": "PC864",
+      "notes": "Arabic",
+      "python_encode": "cp864"
+    },
+    "PC869": {
+      "name": "PC869",
+      "notes": "Greek",
+      "python_encode": "cp869"
+    },
+    "ISO8859_2": {
+      "name": "ISO8859_2",
+      "notes": "Latin 2",
+      "python_encode": "iso8859_2"
+    },
+    "ISO8859_15": {
+      "name": "ISO8859_15",
+      "notes": "Latin 9",
+      "python_encode": "iso8859_15"
+    },
+    "PC1098": {
+      "name": "PC1098",
+      "notes": "Farsi",
+      "python_encode": "cp1098"
+    },
+    "PC1118": {
+      "name": "PC1118",
+      "notes": "Lithuanian",
+      "python_encode": "cp1118"
+    },
+    "PC1119": {
+      "name": "PC1119",
+      "notes": "Lithuanian",
+      "python_encode": "cp1119"
+    },
+    "PC1125": {
+      "name": "PC1125",
+      "notes": "Ukrainian",
+      "python_encode": "cp1125"
+    },
+    "WPC1250": {
+      "name": "WPC1250",
+      "notes": "Latin 2",
+      "python_encode": "cp1250"
+    },
+    "WPC1251": {
+      "name": "WPC1251",
+      "notes": "Cyrillic",
+      "python_encode": "cp1251"
+    },
+    "WPC1253": {
+      "name": "WPC1253",
+      "notes": "Greek",
+      "python_encode": "cp1253"
+    },
+    "WPC1254": {
+      "name": "WPC1254",
+      "notes": "Turkish",
+      "python_encode": "cp1254"
+    },
+    "WPC1255": {
+      "name": "WPC1255",
+      "notes": "Hebrew",
+      "python_encode": "cp1255"
+    },
+    "WPC1256": {
+      "name": "WPC1256",
+      "notes": "Arabic",
+      "python_encode": "cp1256"
+    },
+    "WPC1257": {
+      "name": "WPC1257",
+      "notes": "Baltic Rim",
+      "python_encode": "cp1257"
+    },
+    "WPC1258": {
+      "name": "WPC1258",
+      "notes": "Vietnamese",
+      "python_encode": "cp1258"
+    },
+    "KZ1048": {
+      "name": "KZ1048",
+      "notes": "Kazakh",
+      "python_encode": "kz1048"
+    },
+    "UserDefined": {
+      "name": "UserDefined",
+      "notes": "User-defined page"
+    },
+    "Broken": {
+      "name": "Broken",
+      "notes": "The configuration is broken."
+    }
+  }
+}
