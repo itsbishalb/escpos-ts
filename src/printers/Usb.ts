@@ -94,6 +94,7 @@ export class Usb extends Escpos {
    * @param config.productId - USB Product ID of the printer
    * @param config.interface - USB interface number to claim (default: 0)
    * @param config.profileName - Printer profile name (default: 'default')
+   * @since 1.0.0
    */
   constructor({
     vendorId,

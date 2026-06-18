@@ -67,12 +67,14 @@ export class Dummy extends Escpos {
   /**
    * Open (no-op for dummy printer).
    * @returns Resolved promise
+   * @since 1.0.0
    */
   async open(): Promise<void> {}
 
   /**
    * Close (no-op for dummy printer).
    * @returns Resolved promise
+   * @since 1.0.0
    */
   async close(): Promise<void> {}
 }

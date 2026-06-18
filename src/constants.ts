@@ -394,8 +394,8 @@ export const RT_MASK_NOPAPER  = 114;
  *
  * @example
  * ```ts
- * intLowHigh(512, 2); // → Buffer<[0x00, 0x02]>
- * intLowHigh(7,   2); // → Buffer<[0x07, 0x00]>
+ * intLowHigh(512, 2); // => Buffer containing bytes [0x00, 0x02]
+ * intLowHigh(7,   2); // => Buffer containing bytes [0x07, 0x00]
  * ```
  *
  * @since 1.0.0

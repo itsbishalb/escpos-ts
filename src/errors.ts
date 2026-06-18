@@ -279,12 +279,11 @@ export class USBNotFoundError extends DeviceNotFoundError {
 }
 
 /**
- * Thrown when a requested printer profile name does not exist in the
- * capabilities database.
+ * Thrown when a style variable passed to {@link Escpos.set} is outside the
+ * valid range — for example, when `customSize` is requested with `width` or
+ * `height` outside the 1–8 range.
  *
- * Result code: **100**.
- *
- * @see {@link ProfileManager.getProfile}
+ * Corresponds to Python `SetVariableError` (result code `100`).
  *
  * @since 1.0.0
  */

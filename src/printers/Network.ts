@@ -60,6 +60,7 @@ export class Network extends Escpos {
    * @param config.port - TCP port (default: 9100)
    * @param config.timeout - Connection timeout in ms (default: 5000)
    * @param config.profileName - Printer profile name (default: 'default')
+   * @since 1.0.0
    */
   constructor({ host, port = 9100, timeout = 5000, profileName }: NetworkConfig) {
     super(profileName);
