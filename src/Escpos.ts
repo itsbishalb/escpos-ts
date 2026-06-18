@@ -326,11 +326,11 @@ export abstract class Escpos {
     if (!content) return;
 
     if (!native) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore — QrHelper is implemented in Phase 4
       const { QrHelper } = await import('./qr/QrHelper');
-      const img = await QrHelper.generate(content, { ec, size });
-      await this.image(img, { center });
+      const qrBytes = QrHelper.generate(content, { model, size, eclevel: ec });
+      if (center) this._raw(Buffer.from([0x1b, 0x61, 0x01])); // ESC a 1 — center align
+      this._raw(qrBytes);
+      if (center) this._raw(Buffer.from([0x1b, 0x61, 0x00])); // ESC a 0 — left align restore
       return;
     }
 
