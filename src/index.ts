@@ -8,3 +8,7 @@ export type { CodePageEntry } from './codepages/types';
 export { MagicEncode } from './MagicEncode';
 export { Escpos } from './Escpos';
 export type { TextStyleOptions, BarcodeOptions, QrOptions, ImageOptions, Alignment } from './Escpos';
+export { Dummy } from './printers/Dummy';
+export { Network } from './printers/Network';
+export { Usb } from './printers/Usb';
+export type { UsbConfig, UsbDeviceInfo } from './printers/Usb';
