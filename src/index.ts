@@ -13,3 +13,5 @@ export { Network } from './printers/Network';
 export { Usb } from './printers/Usb';
 export type { UsbConfig, UsbDeviceInfo } from './printers/Usb';
 export { EscposImage } from './image/EscposImage';
+export { QrHelper } from './qr/QrHelper';
+export type { QrOptions as QrHelperOptions } from './qr/QrHelper';
