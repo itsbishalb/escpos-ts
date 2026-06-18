@@ -137,6 +137,8 @@ function decodeWithJimp(buf: Buffer, mime: string): JimpInstance {
  *
  * Dark pixel  → `true`
  * Light pixel → `false`
+ *
+ * @since 1.0.0
  */
 export class EscposImage {
   /** Image width in pixels. */
@@ -175,6 +177,8 @@ export class EscposImage {
    *
    * @param source - Absolute file path or raw image file Buffer.
    * @returns A resolved `EscposImage` instance.
+   *
+   * @since 1.0.0
    */
   static async load(source: string | Buffer): Promise<EscposImage> {
     const { buf, mime } = await loadBuffer(source);
@@ -216,6 +220,8 @@ export class EscposImage {
    * `Escpos.image()` handles this internally when `impl === 'bitImageRaster'`.
    *
    * @returns Raw pixel data buffer.
+   *
+   * @since 1.0.0
    */
   toRasterFormat(): Buffer {
     const buf = Buffer.alloc(this.widthBytes * this.height, 0);
@@ -249,6 +255,8 @@ export class EscposImage {
    *
    * @param highDensity - `true` for 24-dot high-density mode, `false` for
    *   8-dot low-density mode.  Defaults to `false`.
+   *
+   * @since 1.0.0
    */
   *toColumnFormat(highDensity = false): Generator<Buffer> {
     const dotsPerSlice = highDensity ? 24 : 8;
@@ -278,6 +286,8 @@ export class EscposImage {
    * wider than `maxWidth`, this is a no-op.
    *
    * @param maxWidth - Target width in pixels.
+   *
+   * @since 1.0.0
    */
   center(maxWidth: number): void {
     if (this.width >= maxWidth) return;
@@ -298,6 +308,8 @@ export class EscposImage {
    *
    * @param fragmentHeight - Maximum number of rows per fragment.
    * @returns Array of `EscposImage` slices (last slice may be shorter).
+   *
+   * @since 1.0.0
    */
   split(fragmentHeight: number): EscposImage[] {
     const result: EscposImage[] = [];

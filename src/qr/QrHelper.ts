@@ -1,13 +1,12 @@
 /**
- * @file QrHelper.ts
- * @description Builds ESC/POS native QR code byte sequences using the GS ( k
- * command set.  All five required sub-commands (set model, set size, set error
- * correction level, store data, print) are concatenated into a single Buffer
- * that can be written directly to the printer via `_raw()`.
+ * @module escpos-ts/qr/QrHelper
  *
- * References:
- *   - Epson ESC/POS Application Programming Guide (Rev. 1.01)
- *   - python-escpos `escpos.py` `_check_qr` / `qr()` implementation
+ * Builds ESC/POS native QR code byte sequences using the `GS ( k` command
+ * set.  All five required sub-commands (set model, set size, set error
+ * correction level, store data, print) are concatenated into a single
+ * `Buffer` that can be written directly to the printer via `_raw()`.
+ *
+ * Reference: Epson ESC/POS Application Programming Guide Rev. 1.01.
  */
 
 import {
@@ -18,6 +17,8 @@ import {
 
 /**
  * Options controlling the QR code appearance and encoding.
+ *
+ * @since 1.0.0
  */
 export interface QrOptions {
   /**
@@ -113,6 +114,8 @@ const VALID_ECLEVELS = new Set([QR_ECLEVEL_L, QR_ECLEVEL_M, QR_ECLEVEL_Q, QR_ECL
  * });
  * printer._raw(bytes);
  * ```
+ *
+ * @since 1.0.0
  */
 export class QrHelper {
   /**
@@ -125,6 +128,8 @@ export class QrHelper {
    * @throws {RangeError} If `text` is empty.
    * @throws {RangeError} If `size` is outside the 1–16 range.
    * @throws {RangeError} If `model` or `eclevel` is not a recognised constant.
+   *
+   * @since 1.0.0
    */
   static generate(text: string, options: QrOptions = {}): Buffer {
     const {
