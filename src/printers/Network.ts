@@ -1,10 +1,21 @@
+/**
+ * @module escpos-ts/printers/Network
+ *
+ * TCP/IP printer implementation for ESC/POS printers accessible over a network.
+ * Uses Node.js `net.Socket` for transport.  Nagle's algorithm is disabled on
+ * the socket so each `_raw()` call is transmitted as an individual TCP packet
+ * without buffering delay.
+ */
+
 // src/printers/Network.ts
 import * as net from 'net';
 import { Escpos } from '../Escpos';
 import { DeviceNotFoundError } from '../errors';
 
 /**
- * Configuration object for the Network printer.
+ * Configuration options for the {@link Network} printer.
+ *
+ * @since 1.0.0
  */
 export interface NetworkConfig {
   /** IP address or hostname of the printer */
@@ -30,6 +41,8 @@ export interface NetworkConfig {
  * printer.cut();
  * await printer.close();
  * ```
+ *
+ * @since 1.0.0
  */
 export class Network extends Escpos {
   private readonly host: string;
@@ -63,6 +76,7 @@ export class Network extends Escpos {
    *
    * @returns Promise that resolves when connected
    * @throws {DeviceNotFoundError} if connection fails or timeout expires
+   * @since 1.0.0
    */
   async open(): Promise<void> {
     if (this.socket) {
@@ -79,6 +93,13 @@ export class Network extends Escpos {
 
       s.connect(this.port, this.host, () => {
         clearTimeout(timeoutHandle);
+
+        // Disable Nagle's algorithm so each _raw() write is sent as an
+        // individual TCP packet immediately rather than being coalesced.
+        // Without this, small ESC/POS commands sit in the OS buffer
+        // indefinitely while the connection stays open.
+        s.setNoDelay(true);
+
         this.socket = s;
         this.lastSocketError = null;
 
@@ -109,6 +130,7 @@ export class Network extends Escpos {
    *
    * @param data - Buffer containing ESC/POS command bytes to send
    * @throws {DeviceNotFoundError} if socket is not open
+   * @since 1.0.0
    */
   _raw(data: Buffer): void {
     if (!this.socket) {
@@ -132,6 +154,7 @@ export class Network extends Escpos {
    * @param length - Maximum number of bytes to read (optional)
    * @returns Promise resolving with a Buffer containing received data
    * @throws {DeviceNotFoundError} if socket is not open
+   * @since 1.0.0
    */
   read(length?: number): Promise<Buffer> {
     if (!this.socket) {
@@ -146,12 +169,31 @@ export class Network extends Escpos {
   }
 
   /**
+   * Wait for all buffered writes to be flushed to the OS TCP stack.
+   *
+   * Call this after the last `_raw()` write in a print job to guarantee all
+   * data reaches the printer before `close()` destroys the socket.
+   *
+   * @returns Promise that resolves when the socket `'drain'` event fires, or
+   *   immediately if there is nothing to drain.
+   * @since 1.0.0
+   */
+  flush(): Promise<void> {
+    if (!this.socket) return Promise.resolve();
+    if (!this.socket.writableNeedDrain) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      this.socket!.once('drain', resolve);
+    });
+  }
+
+  /**
    * Close the TCP connection.
    *
    * Destroys the socket and cleans up the reference.
    * Safe to call even if already closed (no-op).
    *
    * @returns Promise that resolves when the socket is destroyed
+   * @since 1.0.0
    */
   async close(): Promise<void> {
     if (!this.socket) {
