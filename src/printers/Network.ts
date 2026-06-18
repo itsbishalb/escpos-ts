@@ -36,6 +36,8 @@ export class Network extends Escpos {
   private readonly port: number;
   private readonly timeout: number;
   private socket: net.Socket | null = null;
+  /** Last error emitted by the socket after connect, stored for _raw() diagnostics */
+  private lastSocketError: Error | null = null;
 
   /**
    * Create a new Network printer instance.
@@ -78,10 +80,21 @@ export class Network extends Escpos {
       s.connect(this.port, this.host, () => {
         clearTimeout(timeoutHandle);
         this.socket = s;
+        this.lastSocketError = null;
+
+        // Keep a persistent error handler so Node.js doesn't crash on
+        // post-connect socket errors (e.g. printer resets mid-print).
+        s.on('error', (err: Error) => {
+          this.lastSocketError = err;
+          this.socket = null;
+          s.destroy();
+        });
+
         resolve();
       });
 
-      s.on('error', (err: Error) => {
+      // Pre-connect error (host unreachable, refused, etc.)
+      s.once('error', (err: Error) => {
         clearTimeout(timeoutHandle);
         s.destroy();
         reject(new DeviceNotFoundError(err.message));
@@ -99,13 +112,15 @@ export class Network extends Escpos {
    */
   _raw(data: Buffer): void {
     if (!this.socket) {
-      throw new DeviceNotFoundError('Network socket is not open. Call open() first.');
+      const reason = this.lastSocketError
+        ? this.lastSocketError.message
+        : 'Call open() first.';
+      throw new DeviceNotFoundError(`Network socket is not open. ${reason}`);
     }
-    this.socket.write(data, (err?: Error | null) => {
-      if (err) {
-        throw new DeviceNotFoundError(err.message);
-      }
-    });
+    // Swallow write-callback errors — the persistent 'error' handler above
+    // will fire first and null out this.socket, giving a clear error on the
+    // next _raw() call rather than crashing the process.
+    this.socket.write(data);
   }
 
   /**
