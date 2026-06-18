@@ -24,49 +24,119 @@ import { MagicEncode } from './MagicEncode';
 import { ProfileManager } from './profiles/ProfileManager';
 import type { PrinterProfile } from './profiles/types';
 
+/**
+ * @module escpos-ts/Escpos
+ *
+ * Abstract base class for all ESC/POS printer implementations.
+ *
+ * Provides the complete formatting, text, barcode, QR code, and image API.
+ * Concrete subclasses ({@link Network}, {@link Usb}, {@link Dummy}) implement
+ * the three abstract methods `_raw()`, `open()`, and `close()`.
+ */
+
 export type Alignment = 'left' | 'center' | 'right' | 'justify';
 export type FontName = 'a' | 'b';
 
+/**
+ * Style options for the {@link Escpos.set} and {@link Escpos.setWithDefault} methods.
+ *
+ * All fields are optional.  Omitted fields leave the corresponding printer
+ * attribute unchanged (for {@link Escpos.set}) or use sensible defaults
+ * (for {@link Escpos.setWithDefault}).
+ *
+ * @since 1.0.0
+ */
 export interface TextStyleOptions {
+  /** Horizontal text alignment. */
   align?: 'left' | 'center' | 'right';
+  /** Font identifier: `'a'` for Font A, `'b'` for Font B. */
   font?: string;
+  /** Enable or disable bold text. */
   bold?: boolean;
+  /** Underline thickness: `0` = off, `1` = single, `2` = double. */
   underline?: 0 | 1 | 2;
+  /** Horizontal character width multiplier (1–8×). */
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  /** Vertical character height multiplier (1–8×). */
   height?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  /** Print density (0–8; 9 = use printer default). */
   density?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+  /** Enable white-on-black character inversion. */
   invert?: boolean;
+  /** Enable character smoothing. */
   smooth?: boolean;
+  /** Enable 90-degree character rotation. */
   flip?: boolean;
+  /** Reset character size to 1×1 (cancels double-width/height). */
   normalTextSize?: boolean;
+  /** Print characters at double width. */
   doubleWidth?: boolean;
+  /** Print characters at double height. */
   doubleHeight?: boolean;
+  /** Enable custom `width` × `height` size multipliers (auto-set when w or h > 1). */
   customSize?: boolean;
 }
 
+/**
+ * Options for {@link Escpos.barcode}.
+ *
+ * @since 1.0.0
+ */
 export interface BarcodeOptions {
+  /** Barcode height in dots (1–255; default: 64). */
   height?: number;
+  /** Module width / bar width in dots (2–6; default: 3). */
   width?: number;
+  /** Position of human-readable text relative to the barcode (default: `'BELOW'`). */
   pos?: 'ABOVE' | 'BELOW' | 'BOTH' | 'OFF';
+  /** Font for human-readable text: `'A'` or `'B'` (default: `'A'`). */
   font?: 'A' | 'B';
+  /** Centre the barcode on the receipt (default: `true`). */
   alignCenter?: boolean;
+  /** ESC/POS barcode function type: `'A'` or `'B'` (auto-detected if omitted). */
   functionType?: 'A' | 'B';
+  /** Validate code format before sending to printer (default: `true`). */
   check?: boolean;
 }
 
+/**
+ * Options for {@link Escpos.qr}.
+ *
+ * @since 1.0.0
+ */
 export interface QrOptions {
+  /** Error correction level constant (`QR_ECLEVEL_*`; default: `QR_ECLEVEL_L`). */
   ec?: number;
+  /** Module size in pixels, 1–16 (default: 3). */
   size?: number;
+  /** QR model constant (`QR_MODEL_1`, `QR_MODEL_2`, `QR_MICRO`; default: `QR_MODEL_2`). */
   model?: number;
+  /** Use native printer QR rendering (`true`) or software-generated raster (`false`). Default: `false`. */
   native?: boolean;
+  /** Centre the QR code horizontally on the receipt (default: `false`). */
   center?: boolean;
 }
 
+/**
+ * Options for {@link Escpos.image}.
+ *
+ * @since 1.0.0
+ */
 export interface ImageOptions {
+  /** Print in high vertical density — pixels are not stretched vertically (default: `true`). */
   highDensityVertical?: boolean;
+  /** Print in high horizontal density — pixels are not stretched horizontally (default: `true`). */
   highDensityHorizontal?: boolean;
+  /**
+   * ESC/POS image printing implementation to use (default: `'bitImageRaster'`):
+   * - `'bitImageRaster'` — `GS v 0` raster command; widest compatibility.
+   * - `'graphics'`       — `GS ( L` graphics command; better alignment on some models.
+   * - `'bitImageColumn'` — `ESC *` column command; required for IT80-002 and similar.
+   */
   impl?: 'bitImageRaster' | 'graphics' | 'bitImageColumn';
+  /** Maximum fragment height in pixels; images taller than this are split (default: 960). */
   fragmentHeight?: number;
+  /** Centre the image within the printer's media width (default: `false`). */
   center?: boolean;
 }
 
@@ -84,39 +154,159 @@ for (const [ft, names] of Object.entries(BARCODE_TYPES)) {
 // Suppress unused variable warnings for imports used only in type positions or future methods
 void (TabPosError);
 
+/**
+ * Abstract base class for ESC/POS thermal receipt printers.
+ *
+ * Provides the complete ESC/POS formatting API — text, styles, barcodes, QR
+ * codes, and images.  Hardware transport is handled by subclasses:
+ *
+ * - {@link Network} — TCP/IP printers via Node.js `net.Socket`.
+ * - {@link Usb}     — USB printers via the `usb` npm package (libusb).
+ * - {@link Dummy}   — In-memory buffer for testing without hardware.
+ *
+ * **Subclassing:** Implement `_raw(data: Buffer): void`, `open(): Promise<void>`,
+ * and `close(): Promise<void>`.  All other methods are provided by this class.
+ *
+ * @example
+ * ```ts
+ * const printer = new Network({ host: '192.168.1.100' });
+ * await printer.open();
+ *
+ * printer.setWithDefault({ bold: true, align: 'center' });
+ * printer.textln('ACME Corp');
+ * printer.setWithDefault(); // reset to defaults
+ *
+ * printer.barcode('12345678', 'EAN8');
+ * printer.cut();
+ *
+ * await printer.close();
+ * ```
+ *
+ * @since 1.0.0
+ */
 export abstract class Escpos {
   protected readonly profile: PrinterProfile;
   protected readonly magic: MagicEncode;
 
+  /**
+   * @param profileName - Printer profile name from the capabilities database
+   *   (e.g. `"TM-T88V"`).  Defaults to `"default"`.
+   *   See {@link ProfileManager.listProfiles} for available names.
+   */
   constructor(profileName?: string) {
     this.profile = ProfileManager.getProfile(profileName);
     this.magic = new MagicEncode((data) => this._raw(data), this.profile);
   }
 
+  /**
+   * Send a raw `Buffer` of bytes directly to the printer hardware.
+   *
+   * All higher-level methods ultimately call this.  Subclasses must implement
+   * it to write to the underlying transport (TCP socket, USB endpoint, etc.).
+   *
+   * @param data - Buffer containing ESC/POS command bytes.
+   */
   abstract _raw(data: Buffer): void;
+
+  /**
+   * Open the connection to the printer.
+   *
+   * Must be called before any print commands are sent.  Subclass behaviour:
+   * - {@link Network.open} — establishes a TCP socket.
+   * - {@link Usb.open}     — opens and claims the USB device.
+   * - {@link Dummy.open}   — no-op (always resolves immediately).
+   *
+   * @returns Promise that resolves when the printer is ready to accept data.
+   */
   abstract open(): Promise<void>;
+
+  /**
+   * Close the connection to the printer and release all resources.
+   *
+   * Safe to call even if not connected.  Subclass behaviour:
+   * - {@link Network.close} — destroys the TCP socket.
+   * - {@link Usb.close}     — releases the USB interface and closes the device.
+   * - {@link Dummy.close}   — no-op.
+   *
+   * @returns Promise that resolves when all resources have been released.
+   */
   abstract close(): Promise<void>;
 
   // ── Text ──────────────────────────────────────────────────────────────────
 
+  /**
+   * Print a string using automatic encoding selection.
+   *
+   * Characters are encoded via {@link MagicEncode}, which automatically
+   * selects the best code page for each segment of the string and emits
+   * the necessary `ESC t n` code-page-switch commands.
+   *
+   * @param txt - UTF-8 string to print.
+   * @since 1.0.0
+   */
   text(txt: string): void {
     this.magic.write(txt);
   }
 
+  /**
+   * Print a string followed by a line feed (`\n`).
+   *
+   * Equivalent to `printer.text(txt + '\n')`.
+   *
+   * @param txt - UTF-8 string to print (default: `''` — prints a blank line).
+   * @since 1.0.0
+   */
   textln(txt = ''): void {
     this.text(`${txt}\n`);
   }
 
+  /**
+   * Print `count` blank lines.
+   *
+   * @param count - Number of line feeds to emit (default: 1; must be ≥ 0).
+   * @throws `RangeError` if `count` is negative.
+   * @since 1.0.0
+   */
   ln(count = 1): void {
     if (count < 0) throw new RangeError('count must be >= 0');
     if (count > 0) this.text('\n'.repeat(count));
   }
 
+  /**
+   * Print a word-wrapped text block.
+   *
+   * Wraps `txt` at word boundaries to fit within the column width of the
+   * selected font, as reported by the active printer profile.
+   *
+   * @param txt     - UTF-8 string to wrap and print.
+   * @param font    - Font to use for column-width lookup (`'a'` or `'b'`; default: `'a'`).
+   * @param columns - Override column count (uses profile value if omitted).
+   * @since 1.0.0
+   */
   blockText(txt: string, font: FontName = 'a', columns?: number): void {
     const cols = columns ?? this.profile.getColumns(font);
     this.text(wordWrap(txt, cols));
   }
 
+  /**
+   * Print a row of text in software-defined columns.
+   *
+   * Lays out `textList` into adjacent fixed-width columns, word-wrapping each
+   * cell and aligning content per the corresponding `align` entry.  Outputs
+   * one `textln()` call per row of the resulting grid.
+   *
+   * @param textList - Array of strings, one per column.
+   * @param widths   - Total line width (split evenly) or per-column width array.
+   * @param align    - Alignment for all columns or per-column alignment array.
+   *
+   * @example
+   * ```ts
+   * // Receipt item line: name left-aligned, price right-aligned
+   * printer.softwareColumns(['Americano', '$3.50'], [30, 10], ['left', 'right']);
+   * ```
+   *
+   * @since 1.0.0
+   */
   softwareColumns(
     textList: string[],
     widths: number | number[],
@@ -141,6 +331,20 @@ export abstract class Escpos {
 
   // ── Style ─────────────────────────────────────────────────────────────────
 
+  /**
+   * Apply ESC/POS text style attributes.
+   *
+   * Each field in `opts` that is defined emits the corresponding ESC/POS
+   * command immediately.  Omitted fields are not changed on the printer.
+   *
+   * For size changes, exactly one of `customSize`, `doubleWidth`,
+   * `doubleHeight`, or `normalTextSize` should be set.
+   *
+   * @param opts - Style attributes to apply; see {@link TextStyleOptions}.
+   * @throws {@link SetVariableError} if `customSize` is set but `width` or
+   *   `height` is outside the 1–8 range.
+   * @since 1.0.0
+   */
   set(opts: TextStyleOptions): void {
     const {
       customSize, doubleWidth, doubleHeight, normalTextSize,
@@ -181,6 +385,27 @@ export abstract class Escpos {
     if (invert  !== undefined) this._raw(TXT_STYLE.invert[String(invert) as 'true' | 'false']);
   }
 
+  /**
+   * Apply text styles with full defaults merged in.
+   *
+   * Merges `opts` over a complete default set (`left` align, Font A, no
+   * bold, no underline, 1×1 size, density 9) before calling {@link set}.
+   * Also auto-enables `customSize` when `width` or `height` > 1 is requested
+   * without an explicit size mode, so callers do not need to set the flag manually.
+   *
+   * Calling with no arguments resets the printer to standard text defaults.
+   *
+   * @param opts - Partial style overrides (default: `{}` — full reset).
+   *
+   * @example
+   * ```ts
+   * printer.setWithDefault({ bold: true, align: 'center', height: 2 });
+   * printer.textln('TOTAL');
+   * printer.setWithDefault(); // reset all styles
+   * ```
+   *
+   * @since 1.0.0
+   */
   setWithDefault(opts: TextStyleOptions = {}): void {
     const merged: TextStyleOptions = {
       align: 'left',
@@ -198,11 +423,38 @@ export abstract class Escpos {
       customSize: false,
       ...opts,
     };
+    // Auto-enable customSize when numeric width/height > 1 and no other size
+    // mode was explicitly requested — callers shouldn't need to know the flag.
+    if (
+      !merged.customSize && !merged.doubleWidth && !merged.doubleHeight &&
+      ((merged.width ?? 1) > 1 || (merged.height ?? 1) > 1)
+    ) {
+      merged.customSize = true;
+    }
     const { customSize, doubleWidth, doubleHeight } = merged;
     merged.normalTextSize = !customSize && !doubleWidth && !doubleHeight;
     this.set(merged);
   }
 
+  /**
+   * Set or reset the line spacing.
+   *
+   * When called without arguments, resets line spacing to the printer default
+   * (`ESC 2`).  When `spacing` is provided, sets the line spacing to
+   * `spacing / divisor` inches per dot using the matching ESC/POS command:
+   *
+   * | Divisor | Command | Range |
+   * |---------|---------|-------|
+   * | 60      | `ESC A` | 0–85 |
+   * | 180     | `ESC 3` | 0–255 |
+   * | 360     | `ESC +` | 0–255 |
+   *
+   * @param spacing - Spacing value in dots (omit to reset).
+   * @param divisor - Unit divisor: `60`, `180`, or `360` (default: `180`).
+   * @throws `RangeError` if `divisor` is not one of `60 | 180 | 360`.
+   * @throws `RangeError` if `spacing` is outside the valid range for the divisor.
+   * @since 1.0.0
+   */
   lineSpacing(spacing?: number, divisor: 60 | 180 | 360 = 180): void {
     if (spacing === undefined) {
       this._raw(LINESPACING_RESET);
@@ -218,6 +470,19 @@ export abstract class Escpos {
 
   // ── Hardware ──────────────────────────────────────────────────────────────
 
+  /**
+   * Send a hardware control command to the printer.
+   *
+   * | Action   | Command | Effect |
+   * |----------|---------|--------|
+   * | `'INIT'` | `ESC @` | Clear print buffer and reset modes to defaults |
+   * | `'SELECT'` | `ESC =` | Select printer as the active peripheral |
+   * | `'RESET'` | `ESC ?` | Soft reset |
+   *
+   * @param action - One of `'INIT'`, `'SELECT'`, or `'RESET'`.
+   * @throws `Error` if `action` is not one of the three valid values.
+   * @since 1.0.0
+   */
   hw(action: 'INIT' | 'SELECT' | 'RESET'): void {
     const map: Record<string, Buffer> = {
       INIT: HW_INIT,
@@ -229,6 +494,18 @@ export abstract class Escpos {
     this._raw(cmd);
   }
 
+  /**
+   * Cut the paper.
+   *
+   * Feeds 6 lines before cutting unless `feed` is `false`.  Falls back to a
+   * full cut when the profile does not support partial cuts, and vice versa.
+   *
+   * @param mode - `'FULL'` (default) for a complete cut, `'PART'` to leave
+   *   a small uncut section.
+   * @param feed - Feed paper before cutting (default: `true`).
+   * @throws `Error` if `mode` is not `'FULL'` or `'PART'`.
+   * @since 1.0.0
+   */
   cut(mode: 'FULL' | 'PART' = 'FULL', feed = true): void {
     if (!feed) {
       this._raw(Buffer.concat([GS, Buffer.from([0x56, 0x42, 0x00])]));
@@ -244,10 +521,24 @@ export abstract class Escpos {
     }
   }
 
+  /**
+   * Print and feed `n` lines (`ESC d n`).
+   *
+   * @param lines - Number of lines to feed (0–255).
+   * @since 1.0.0
+   */
   printAndFeed(lines: number): void {
     this._raw(Buffer.concat([ESC, Buffer.from('d'), Buffer.from([lines])]));
   }
 
+  /**
+   * Send a cash-drawer open pulse.
+   *
+   * @param pin - Cash-drawer pin: `2`, `5`, or a 5-element array
+   *   `[esc, p, m, t1, t2]` for a custom DEC sequence.
+   * @throws {@link CashDrawerError} if `pin` is not `2`, `5`, or a valid 5-element array.
+   * @since 1.0.0
+   */
   cashdraw(pin: number | number[]): void {
     if (pin === 2) { this._raw(CD_KICK_2); return; }
     if (pin === 5) { this._raw(CD_KICK_5); return; }
@@ -262,6 +553,17 @@ export abstract class Escpos {
 
   // ── Barcode ───────────────────────────────────────────────────────────────
 
+  /**
+   * Validate a barcode code string against the format rules for a given barcode type.
+   *
+   * Checks that the code length falls within an allowed range and that the
+   * string matches the required character set for the barcode type.
+   *
+   * @param bc   - Barcode type name (e.g. `'CODE128'`, `'EAN13'`).
+   * @param code - Barcode data string to validate.
+   * @returns `true` if the code is valid for the given type.
+   * @since 1.0.0
+   */
   static checkBarcode(bc: string, code: string): boolean {
     const fmt = BARCODE_FORMATS[bc];
     if (!fmt) return false;
@@ -272,6 +574,32 @@ export abstract class Escpos {
     );
   }
 
+  /**
+   * Print a hardware barcode.
+   *
+   * Sends the appropriate `GS k` sequence for the requested barcode type and
+   * function type.  Supports all types defined in {@link BARCODE_TYPES}
+   * (UPC-A, UPC-E, EAN8, EAN13, CODE39, ITF, NW7/CODABAR, CODE93, CODE128,
+   * and GS1 variants for Function Type B).
+   *
+   * @param code - Barcode data string.
+   * @param bc   - Barcode type name (e.g. `'CODE128'`, `'EAN13'`).
+   *   Names are normalised (non-alphanumeric removed, uppercased) before lookup.
+   * @param opts - Optional barcode appearance settings; see {@link BarcodeOptions}.
+   *
+   * @throws {@link BarcodeTypeError} if the type is unrecognised or unsupported.
+   * @throws {@link BarcodeCodeError} if `code` fails format validation and
+   *   `opts.check` is `true` (default).
+   * @throws {@link BarcodeSizeError} if `height` or `width` are out of range.
+   *
+   * @example
+   * ```ts
+   * printer.barcode('012345678905', 'EAN13', { pos: 'BELOW', height: 80 });
+   * printer.barcode('{B12345678', 'CODE128', { functionType: 'B' });
+   * ```
+   *
+   * @since 1.0.0
+   */
   barcode(code: string, bc: string, opts: BarcodeOptions = {}): void {
     const {
       height = 64, width = 3, pos = 'BELOW', font = 'A',
@@ -313,6 +641,31 @@ export abstract class Escpos {
 
   // ── QR ────────────────────────────────────────────────────────────────────
 
+  /**
+   * Print a QR code.
+   *
+   * Two rendering modes are available, controlled by `opts.native`:
+   *
+   * - **Software mode** (`native: false`, default) — generates the QR matrix
+   *   locally using the `qrcode` package and sends it as a raster image via
+   *   {@link image}.  Works on all printers that support raster images.
+   *
+   * - **Native mode** (`native: true`) — sends the five `GS ( k` sub-commands
+   *   (set model, size, error correction, store data, print) directly.
+   *   Requires the printer to have a built-in QR engine (most Epson TM series).
+   *
+   * @param content - The string to encode (UTF-8).
+   * @param opts    - QR code appearance options; see {@link QrOptions}.
+   *
+   * @throws `Error` if `ec`, `size`, or `model` values are outside valid ranges.
+   *
+   * @example
+   * ```ts
+   * await printer.qr('https://example.com', { size: 4, ec: QR_ECLEVEL_M });
+   * ```
+   *
+   * @since 1.0.0
+   */
   async qr(content: string, opts: QrOptions = {}): Promise<void> {
     const {
       ec = QR_ECLEVEL_L, size = 3, model = QR_MODEL_2,
@@ -354,6 +707,37 @@ export abstract class Escpos {
 
   // ── Image ─────────────────────────────────────────────────────────────────
 
+  /**
+   * Print an image from a file path or raw image `Buffer`.
+   *
+   * Supported formats: PNG, JPEG, BMP, GIF, TIFF.
+   *
+   * The image is:
+   *  1. Loaded and decoded (alpha channel composited onto white background).
+   *  2. Converted to greyscale and thresholded at luminance 128.
+   *  3. Optionally centred within the profile's media width.
+   *  4. Split into vertical fragments if taller than `fragmentHeight`.
+   *  5. Encoded using the selected `impl` and written via `_raw()`.
+   *
+   * **`impl` options:**
+   * - `'bitImageRaster'` (default) — `GS v 0`; widest printer compatibility.
+   * - `'graphics'`                 — `GS ( L`; better alignment on some models.
+   * - `'bitImageColumn'`           — `ESC *`; required for printers like IT80-002.
+   *
+   * @param source - Absolute file path or raw image `Buffer`.
+   * @param opts   - Image rendering options; see {@link ImageOptions}.
+   *
+   * @throws {@link ImageWidthError} if the image is wider than the profile's
+   *   declared media width.
+   *
+   * @example
+   * ```ts
+   * await printer.image('./receipt-logo.png', { center: true });
+   * await printer.image('./receipt-logo.png', { impl: 'bitImageColumn' });
+   * ```
+   *
+   * @since 1.0.0
+   */
   async image(source: string | Buffer, opts: ImageOptions = {}): Promise<void> {
     const { EscposImage } = await import('./image/EscposImage');
     const im = await EscposImage.load(source);
@@ -447,14 +831,35 @@ export abstract class Escpos {
 
   // ── Line display ──────────────────────────────────────────────────────────
 
+  /**
+   * Open or close the line (customer) display.
+   *
+   * @param select - `true` to select the display (`ESC = 2`),
+   *   `false` to return to the printer (`ESC = 1`).
+   * @since 1.0.0
+   */
   linedisplaySelect(select: boolean): void {
     this._raw(select ? LINE_DISPLAY_OPEN : LINE_DISPLAY_CLOSE);
   }
 
+  /**
+   * Clear the content of the line display (`ESC @`).
+   *
+   * @since 1.0.0
+   */
   linedisplayClear(): void {
     this._raw(LINE_DISPLAY_CLEAR);
   }
 
+  /**
+   * Open the line display, clear it, write text, then close it.
+   *
+   * Convenience wrapper around {@link linedisplaySelect}, {@link linedisplayClear},
+   * and {@link text}.
+   *
+   * @param text - Text to display on the customer-facing line display.
+   * @since 1.0.0
+   */
   linedisplay(text: string): void {
     this.linedisplaySelect(true);
     this.linedisplayClear();
