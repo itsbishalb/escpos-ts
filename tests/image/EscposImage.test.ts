@@ -133,6 +133,50 @@ describe('EscposImage', () => {
     expect(columns[0]).toEqual(Buffer.from([0xff, 0xff, 0xff]));
   });
 
+  test('toColumnFormat() encodes all rows for an image taller than dotsPerSlice', async () => {
+    // 4 columns × 32 rows all-black, low density (8 dots/slice)
+    // Expected: 4 columns × 4 slices = 16 yielded buffers, each 0xFF (all 8 dots set)
+    const pngBuf = await makeSolidImageBuffer(4, 32, 0x000000ff);
+    const img = await EscposImage.load(pngBuf);
+    const columns = [...img.toColumnFormat(false)];
+
+    // width=4, slices=32/8=4 → 4*4=16 total column-strip buffers
+    expect(columns.length).toBe(4 * 4);
+
+    // Every buffer must be 0xFF: all 8 dots in each slice are black
+    for (const col of columns) {
+      expect(col.length).toBe(1);
+      expect(col[0]).toBe(0xff);
+    }
+  });
+
+  test('toColumnFormat() encodes rows in second slice correctly (low density, 16-row image)', async () => {
+    // 1 column × 16 rows: top 8 rows white, bottom 8 rows black
+    // Low density (8 dots/slice): slice 0 → 0x00, slice 1 → 0xFF
+    const { EscposImage: EI } = await import('../../src/image/EscposImage');
+
+    // Build a 1×16 image programmatically via Jimp: top half white, bottom half black
+    const img1 = new Jimp({ width: 1, height: 16, color: 0xffffffff });
+    // Paint rows 8-15 black
+    for (let y = 8; y < 16; y++) {
+      img1.setPixelColor(0x000000ff, 0, y);
+    }
+    const pngBuf = await img1.getBuffer('image/png');
+
+    const img = await EI.load(pngBuf);
+    expect(img.width).toBe(1);
+    expect(img.height).toBe(16);
+
+    // toColumnFormat(false): 1 col × 2 slices → 2 buffers
+    const columns = [...img.toColumnFormat(false)];
+    expect(columns.length).toBe(2);
+
+    // Slice 0: rows 0-7 all white → 0x00
+    expect(columns[0][0]).toBe(0x00);
+    // Slice 1: rows 8-15 all black → 0xFF
+    expect(columns[1][0]).toBe(0xff);
+  });
+
   // ── center() ──────────────────────────────────────────────────────────
 
   test('center() pads pixel rows and updates width/widthBytes', async () => {

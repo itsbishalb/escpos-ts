@@ -255,15 +255,18 @@ export class EscposImage {
     const bytesPerCol = dotsPerSlice / 8; // 3 or 1
 
     for (let x = 0; x < this.width; x++) {
-      const col = Buffer.alloc(bytesPerCol, 0);
-      for (let y = 0; y < this.height && y < dotsPerSlice; y++) {
-        if (this.pixels[y]?.[x]) {
-          const byteIndex = Math.floor(y / 8);
-          const bitShift = 7 - (y % 8);
-          col[byteIndex] |= 1 << bitShift;
+      for (let rowStart = 0; rowStart < this.height; rowStart += dotsPerSlice) {
+        const col = Buffer.alloc(bytesPerCol, 0);
+        for (let dot = 0; dot < dotsPerSlice; dot++) {
+          const y = rowStart + dot;
+          if (y < this.height && this.pixels[y]?.[x]) {
+            const byteIndex = Math.floor(dot / 8);
+            const bitShift = 7 - (dot % 8);
+            col[byteIndex] |= 1 << bitShift;
+          }
         }
+        yield col;
       }
-      yield col;
     }
   }
 
