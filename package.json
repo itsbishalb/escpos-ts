@@ -22,6 +22,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "iconv-lite": "^0.7.2",
     "jimp": "^1.1.4",
     "qrcode": "^1.5.4",
     "usb": "^2.14.0"
