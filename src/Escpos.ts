@@ -855,7 +855,7 @@ export abstract class Escpos {
    * Open the line display, clear it, write text, then close it.
    *
    * Convenience wrapper around {@link linedisplaySelect}, {@link linedisplayClear},
-   * and {@link text}.
+   * and {@link Escpos.text}.
    *
    * @param text - Text to display on the customer-facing line display.
    * @since 1.0.0

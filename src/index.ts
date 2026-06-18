@@ -64,11 +64,12 @@ export { MagicEncode } from './MagicEncode';
 
 // ── Base class ───────────────────────────────────────────────────────────────
 export { Escpos } from './Escpos';
-export type { TextStyleOptions, BarcodeOptions, QrOptions, ImageOptions, Alignment } from './Escpos';
+export type { TextStyleOptions, BarcodeOptions, QrOptions, ImageOptions, Alignment, FontName } from './Escpos';
 
 // ── Printer implementations ──────────────────────────────────────────────────
 export { Dummy } from './printers/Dummy';
 export { Network } from './printers/Network';
+export type { NetworkConfig } from './printers/Network';
 export { Usb } from './printers/Usb';
 export type { UsbConfig, UsbDeviceInfo } from './printers/Usb';
 
