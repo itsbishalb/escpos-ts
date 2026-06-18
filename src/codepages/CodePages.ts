@@ -1,4 +1,5 @@
 // src/codepages/CodePages.ts
+import * as iconv from 'iconv-lite';
 import capabilitiesJson from '../profiles/capabilities.json';
 import type { CapabilitiesData } from '../profiles/types';
 import type { CodePageEntry } from './types';
@@ -44,12 +45,14 @@ export const CodePages = {
     }
 
     if (enc.python_encode) {
-      // Node.js Buffer does not support cp437-style code page names —
-      // only latin1/utf8/ascii/hex/base64 are supported.
-      console.warn(
-        `[CodePages] Cannot decode python_encode "${enc.python_encode}" in Node.js; returning [].`
-      );
-      return [];
+      if (!iconv.encodingExists(enc.python_encode)) {
+        throw new LookupError(`iconv-lite does not support encoding "${enc.python_encode}"`);
+      }
+      const chars: string[] = [];
+      for (let i = 128; i < 256; i++) {
+        chars.push(iconv.decode(Buffer.from([i]), enc.python_encode));
+      }
+      return chars;
     }
 
     throw new LookupError(`Can't find a known encoding for ${encoding}`);

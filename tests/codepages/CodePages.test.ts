@@ -19,11 +19,11 @@ describe('CodePages', () => {
     expect(() => CodePages.getEncoding('TOTALLY_FAKE_ENCODING')).toThrow();
   });
 
-  test('getCodepageCharList returns empty array for python_encode encodings', () => {
+  test('getCodepageCharList returns 128 chars for python_encode encodings via iconv-lite', () => {
     const chars = CodePages.getCodepageCharList('CP437');
     expect(Array.isArray(chars)).toBe(true);
-    // CP437 has python_encode, not data — should return []
-    expect(chars).toEqual([]);
+    // CP437 has python_encode — iconv-lite decodes bytes 128–255
+    expect(chars.length).toBe(128);
   });
 
   test('getCodepageCharList returns 128 chars for data-based encoding', () => {
