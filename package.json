@@ -1,7 +1,15 @@
 {
-  "name": "escpos-ts",
+  "name": "@itsbishalb/escpos-ts",
   "version": "1.0.0",
-  "description": "TypeScript ESC/POS printer library",
+  "description": "TypeScript ESC/POS printer library — port of python-escpos",
+  "author": "Bishal Bhandari <bishalbhandari.me@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsbishalb/escpos-ts.git"
+  },
+  "keywords": ["escpos", "thermal", "printer", "pos", "typescript", "receipt"],
+  "files": ["dist/"],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
