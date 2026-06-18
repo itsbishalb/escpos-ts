@@ -12,3 +12,4 @@ export { Dummy } from './printers/Dummy';
 export { Network } from './printers/Network';
 export { Usb } from './printers/Usb';
 export type { UsbConfig, UsbDeviceInfo } from './printers/Usb';
+export { EscposImage } from './image/EscposImage';

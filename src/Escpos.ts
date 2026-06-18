@@ -355,6 +355,21 @@ export abstract class Escpos {
   // ── Image ─────────────────────────────────────────────────────────────────
 
   async image(source: string | Buffer, opts: ImageOptions = {}): Promise<void> {
+    const { EscposImage } = await import('./image/EscposImage');
+    const im = await EscposImage.load(source);
+    await this._renderImage(im, opts, EscposImage);
+  }
+
+  /**
+   * Internal image renderer.  Accepts a pre-loaded `EscposImage` so that the
+   * fragment-recursion path can reuse the already-decoded bitmap without going
+   * through the file-loading / MIME-detection pipeline again.
+   */
+  private async _renderImage(
+    im: import('./image/EscposImage').EscposImage,
+    opts: ImageOptions,
+    EscposImage: typeof import('./image/EscposImage').EscposImage,
+  ): Promise<void> {
     const {
       highDensityVertical = true,
       highDensityHorizontal = true,
@@ -362,11 +377,6 @@ export abstract class Escpos {
       fragmentHeight = 960,
       center = false,
     } = opts;
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore — EscposImage is implemented in Phase 4
-    const { EscposImage } = await import('./image/EscposImage');
-    const im = await EscposImage.load(source);
 
     try {
       const profileMedia = (this.profile.profileData as unknown as Record<string, unknown>)?.['media'];
@@ -384,7 +394,7 @@ export abstract class Escpos {
 
     if (im.height > fragmentHeight) {
       for (const fragment of im.split(fragmentHeight)) {
-        await this.image(fragment, { ...opts, center: false });
+        await this._renderImage(fragment, { ...opts, center: false }, EscposImage);
       }
       return;
     }
