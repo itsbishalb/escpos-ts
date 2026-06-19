@@ -4,6 +4,8 @@ A strictly-typed TypeScript port of [python-escpos](https://github.com/python-es
 
 This library was converted from python-escpos as part of a new POS project, targeting an offline-first Node.js/Electron environment.
 
+📖 **[API Documentation](https://itsbishalb.github.io/escpos-ts/)**
+
 ## Features
 
 - Network (TCP/IP), USB, and in-memory (Dummy) printer connections
