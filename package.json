@@ -8,8 +8,17 @@
     "type": "git",
     "url": "git+https://github.com/itsbishalb/escpos-ts.git"
   },
-  "keywords": ["escpos", "thermal", "printer", "pos", "typescript", "receipt"],
-  "files": ["dist/"],
+  "keywords": [
+    "escpos",
+    "thermal",
+    "printer",
+    "pos",
+    "typescript",
+    "receipt"
+  ],
+  "files": [
+    "dist/"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -30,8 +39,13 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "@jimp/core": "^1.6.1",
+    "@jimp/js-bmp": "^1.6.1",
+    "@jimp/js-jpeg": "^1.6.1",
+    "@jimp/js-png": "^1.6.1",
+    "@jimp/plugin-blit": "^1.6.1",
+    "@jimp/plugin-color": "^1.6.1",
     "iconv-lite": "^0.7.2",
-    "jimp": "^1.1.4",
     "qrcode": "^1.5.4",
     "usb": "^2.14.0"
   }

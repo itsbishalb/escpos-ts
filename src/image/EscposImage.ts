@@ -23,7 +23,18 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { Jimp, type JimpInstance } from 'jimp';
+import { createJimp } from '@jimp/core';
+import JpegPlugin from '@jimp/js-jpeg';
+import PngPlugin from '@jimp/js-png';
+import BmpPlugin from '@jimp/js-bmp';
+import { methods as colorMethods } from '@jimp/plugin-color';
+import { methods as blitMethods } from '@jimp/plugin-blit';
+
+const Jimp = createJimp({
+  formats: [JpegPlugin, PngPlugin, BmpPlugin],
+  plugins: [colorMethods, blitMethods],
+});
+type JimpInstance = InstanceType<typeof Jimp>;
 
 // ── Type helpers ─────────────────────────────────────────────────────────────
 
