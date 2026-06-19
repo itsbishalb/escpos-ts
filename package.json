@@ -1,6 +1,6 @@
 {
   "name": "@itsbishalb/escpos-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript ESC/POS printer library — port of python-escpos",
   "author": "Bishal Bhandari <bishalbhandari.me@gmail.com>",
   "license": "MIT",
